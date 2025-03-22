@@ -9,8 +9,8 @@ from matplotlib.ticker import MultipleLocator  # 新增刻度控制
 # ================= 参数配置区域 =================
 
 SELECTED_COLS = [
-    "CR温度2",
     "CR温度1",
+    "CR温度2",
     "温度9 (℃)",
     "温度8 (℃)",
     "温度7 (℃)",
@@ -23,20 +23,19 @@ SELECTED_COLS = [
 ]
 
 DEPTHS = [-0, -0.2, -0.4, -0.6, -0.8, -1, -1.2, -1.4, -1.6, -1.8, -2]  # 单位：米
-INTERP_DEPTH_STEP = 0.01  # 插值步长 (米)
+INTERP_DEPTH_STEP = 0.001  # 插值步长 (米)
 VMIN = -18
-VMAX = 9
+VMAX = 5
 TICK_STEP = 3  # 颜色条主刻度间隔 (℃)
 DATE_TICKS = 5  # 日期刻度数量
 
-# 颜色定义
+# 颜色定义，
 COLORS = [
     (-18, "#0000FF"),  # 深蓝
     (-12, "#00FFFF"),  # 皇家蓝
     (-6, "#5deb69"),  # 天蓝
     (0, "#FFFF00"),  # 黄色
-    (6, "#fd6a0f"),  # 橙色
-    (9, "#FF0000"),  # 红色
+    (5, "#FF0000"),  # 红色
 ]
 
 # 间距控制参数（单位：磅）
@@ -57,7 +56,7 @@ plt.rcParams["font.family"] = "sans-serif"
 plt.rcParams["font.sans-serif"] = ["Microsoft YaHei"]
 
 # 读取数据
-data_path = r"S:\STU-DATA\兴凯湖实地数据\2025.1.18-2.16\逐分钟温度链数据(2.9).xlsx"
+data_path = r"S:\STU-DATA\兴凯湖实地数据\2025.1.18-2.16\两个平台结合后的数据\逐分钟温度链数据(2.9) 修复温度5.xlsx"
 df = pd.read_excel(data_path)
 
 # 时间序列处理

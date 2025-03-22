@@ -14,12 +14,12 @@ plt.rcParams["font.family"] = "sans-serif"
 plt.rcParams["font.sans-serif"] = ["Microsoft YaHei"]
 
 # 读取数据
-data_path = r"S:\STU-DATA\兴凯湖实地数据\2025.1.18-2.16\逐分钟温度链数据(2.9).xlsx"
+data_path = r"S:\STU-DATA\兴凯湖实地数据\2025.1.18-2.16\两个平台结合后的数据\逐分钟温度链数据(2.9) 修复温度5.xlsx"
 df = pd.read_excel(data_path)
 # =================================#
 SELECTED_COLS = [
-    "CR温度2",
     "CR温度1",
+    "CR温度2",
     "温度9 (℃)",
     "温度8 (℃)",
     "温度7 (℃)",

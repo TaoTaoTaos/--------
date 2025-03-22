@@ -1,52 +1,90 @@
 import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
+from matplotlib.ticker import AutoMinorLocator, MultipleLocator
+import matplotlib.dates as mdates
 
-# 文件路径（使用原始字符串避免转义问题）
-file_path = r"S:\STU-DATA\兴凯湖实地数据\2025.1.18-2.16\cr1000x初始数据\CR100X处理后数据\CR1000X平均数据(每分钟).xlsx"
 plt.rcParams["font.family"] = "sans-serif"
 plt.rcParams["font.sans-serif"] = ["Microsoft YaHei"]
 
-# 读取Excel数据
-try:
-    df = pd.read_excel(file_path, engine="openpyxl")
-except FileNotFoundError:
-    print("文件路径错误，请确认文件是否存在！")
-    exit()
+# 参数配置
+FILE_PATH = r"S:\STU-DATA\兴凯湖实地数据\2025.1.18-2.16\cr1000x数据\CR1000X处理后数据\CR1000X平均数据(每分钟).xlsx"
+DATA_COL = "高度计（冰厚）"  # 修改后的数据列名
+TIME_COL = "时间"
+THRESHOLD = 0.4  # 30%阈值
 
-# 定义物理范围常量
-PHYSICAL_MIN = 0  # 冰厚最小值（单位：米）
-PHYSICAL_MAX = 0.4  # 冰厚最大值（单位：米）
+# 读取数据
+df = pd.read_excel(FILE_PATH)
+df[TIME_COL] = pd.to_datetime(df[TIME_COL])
+df = df.set_index(TIME_COL).sort_index()
 
-# 确认列名（根据实际数据调整）
-ice_thickness_col = "高度计（冰厚）"  # 冰厚数据列名
-time_col = "时间"  # 时间列名
 
-# 检查列是否存在
-if ice_thickness_col not in df.columns or time_col not in df.columns:
-    print("列名不匹配，请检查数据列名！")
-    print("可用列名：", df.columns.tolist())
-    exit()
+# 数据降噪处理（保持原有逻辑）
+def denoise_data(series, threshold):
+    processed = series.copy()
+    for day in pd.date_range(
+        start=series.index.min().date(), end=series.index.max().date(), freq="D"
+    ):
+        daily_data = series[day.strftime("%Y-%m-%d")]
+        if len(daily_data) == 0:
+            continue
+        avg = daily_data.mean()
+        valid_range = (avg * (1 - threshold), avg * (1 + threshold))
+        mask = daily_data.between(*valid_range)
+        processed.loc[daily_data[~mask].index] = np.nan
+    return processed
 
-# 过滤极端值：将超出范围的值设为NaN
-df[ice_thickness_col] = df[ice_thickness_col].where(
-    (df[ice_thickness_col] >= PHYSICAL_MIN) & (df[ice_thickness_col] <= PHYSICAL_MAX),
-    np.nan,
+
+processed = denoise_data(df[DATA_COL], THRESHOLD)
+
+# 绘图设置
+plt.figure(figsize=(14, 7), dpi=100)
+ax = plt.gca()
+
+# 绘制原始数据
+ax.plot(
+    df.index, df[DATA_COL], color="#D3D3D3", linewidth=0.8, alpha=0.7, label="原始数据"
 )
 
-# 转换时间列为datetime格式
-df[time_col] = pd.to_datetime(df[time_col], errors="coerce")
-
-# 绘制折线图
-plt.figure(figsize=(15, 6))
-plt.plot(
-    df[time_col], df[ice_thickness_col], linestyle="-", linewidth=1, color="#1f77b4"
+# 绘制处理数据
+ax.plot(
+    processed.index,
+    processed,
+    color="#FF4500",
+    linewidth=1.2,
+    label=f"降噪数据（阈值{THRESHOLD*100:.0f}%）",
 )
-plt.title("兴凯湖冰厚随时间变化趋势（过滤极端值后）", fontsize=14)
-plt.xlabel("时间", fontsize=12)
-plt.ylabel("冰厚（米）", fontsize=12)
-plt.grid(True, linestyle="--", alpha=0.7)
-plt.xticks(rotation=45)
-plt.tight_layout()  # 自动调整布局
 
+# 纵坐标设置
+ax.set_ylim(0, 0.5)
+ax.yaxis.set_major_locator(MultipleLocator(0.1))  # 主刻度每0.1
+ax.yaxis.set_minor_locator(MultipleLocator(0.02))  # 次刻度每0.02
+ax.yaxis.set_major_formatter("{x:.2f}")  # 保留两位小数
+
+# 图表美化
+ax.set_title(
+    "测量数据降噪处理对比\n(兴凯湖 2025-01-18至2025-02-16)", pad=20, fontsize=14
+)
+ax.set_xlabel("日期", labelpad=12)
+ax.set_ylabel("测量值", labelpad=12)
+ax.grid(which="major", linestyle="--", alpha=0.7)
+ax.grid(which="minor", linestyle=":", alpha=0.4)
+ax.tick_params(axis="both", which="both", length=4)
+
+# 日期格式化
+ax.xaxis.set_major_formatter(mdates.ConciseDateFormatter(ax.xaxis.get_major_locator()))
+
+# 图例优化
+handles, labels = ax.get_legend_handles_labels()
+ax.legend(
+    handles,
+    labels,
+    frameon=False,
+    bbox_to_anchor=(0.18, 0.95),
+    fontsize=10,
+    handlelength=1.5,
+    handletextpad=0.5,
+)
+
+plt.tight_layout()
 plt.show()
