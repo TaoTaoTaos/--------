@@ -12,9 +12,10 @@ FILE_PATH = r"S:\STU-DATA\兴凯湖实地数据\2025.1.18-2.16\cr1000x数据\CR1
 DATA_COL = "高度计（冰厚）"  # 修改后的数据列名
 TIME_COL = "时间"
 THRESHOLD = 0.1  # 阈值
-WINDOW_SIZE = 120  # 滑动平均窗口（60分钟）
-START_DATE = "2025-01-20"  # 绘图起始时间
-END_DATE = "2025-02-20"  # 绘图结束时间
+WINDOW_SIZE = 1400  # 滑动平均窗口（60分钟）
+START_DATE = "2025-01-18"  # 绘图起始时间
+END_DATE = "2025-02-18"  # 绘图结束时间
+OUTPUT_PATH = r"S:\STU-DATA\兴凯湖实地数据\2025.1.18-2.16\cr1000x数据\CR1000X处理后数据\日均值数据.csv"  # 日均值数据导出路径
 
 # 读取数据
 df = pd.read_excel(FILE_PATH)
@@ -48,6 +49,12 @@ df_filtered = df.loc[START_DATE:END_DATE]
 processed_filtered = processed.loc[START_DATE:END_DATE]
 sma_filtered = sma.loc[START_DATE:END_DATE]
 sma_daily_filtered = sma_daily.loc[START_DATE:END_DATE]
+
+# 导出日均值数据
+sma_daily_filtered.to_csv(
+    OUTPUT_PATH, index=True, encoding="utf-8-sig"
+)  # 导出为 CSV 文件
+print(f"日均值数据已导出至：{OUTPUT_PATH}")
 
 # 绘图设置
 plt.figure(figsize=(14, 7), dpi=100)
