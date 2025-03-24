@@ -31,11 +31,11 @@ DATE_TICKS = 5  # 日期刻度数量
 
 # 颜色定义，
 COLORS = [
-    (-18, "#0000FF"),  # 深蓝
-    (-12, "#00FFFF"),  # 皇家蓝
+    (-18, "#FF0000"),  # 深蓝
+    (-12, "#FFFF00"),  # 皇家蓝
     (-6, "#5deb69"),  # 天蓝
-    (0, "#FFFF00"),  # 黄色
-    (5, "#FF0000"),  # 红色
+    (0, "#00FFFF"),  # 黄色
+    (5, "#0000FF"),  # 红色
 ]
 
 # 间距控制参数（单位：磅）
@@ -72,6 +72,7 @@ interp_matrix = []
 
 # 对每个时间点进行三次样条插值
 for timestamp in df_temp.index:
+    print("正在插值")
     depths_sorted = sorted(DEPTHS)
     values_sorted = [df_temp.loc[timestamp, col] for col in reversed(SELECTED_COLS)]
     f = interpolate.interp1d(
