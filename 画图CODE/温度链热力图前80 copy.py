@@ -26,7 +26,7 @@ SELECTED_COLS = [
 ]  # 注意传感器顺序
 
 DEPTHS = [-0, -0.2, -0.4, -0.6, -0.8]  # 单位：米
-INTERP_DEPTH_STEP = 0.001  # 插值步长 (米)
+INTERP_DEPTH_STEP = 0.01  # 插值步长 (米)
 VMIN = -18
 VMAX = 6
 TICK_STEP = 6  # 颜色条主刻度间隔 (℃)
@@ -74,12 +74,12 @@ df_temp = df[SELECTED_COLS].copy().astype(float)
 new_depths = np.arange(DEPTHS[0], DEPTHS[-1] - INTERP_DEPTH_STEP, -INTERP_DEPTH_STEP)
 interp_matrix = []
 
-# 对每个时间点进行三次样条插值
+# 对每个时间点进行2次样条插值
 for timestamp in df_temp.index:
     depths_sorted = sorted(DEPTHS)
     values_sorted = [df_temp.loc[timestamp, col] for col in reversed(SELECTED_COLS)]
     f = interpolate.interp1d(
-        depths_sorted, values_sorted, kind="cubic", fill_value="extrapolate"
+        depths_sorted, values_sorted, kind="quadratic", fill_value="extrapolate"
     )
     interp_values = f(new_depths)
     interp_matrix.append(interp_values)

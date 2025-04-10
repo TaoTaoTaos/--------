@@ -23,7 +23,7 @@ SELECTED_COLS = [
 ]
 
 DEPTHS = [-0, -0.2, -0.4, -0.6, -0.8, -1, -1.2, -1.4, -1.6, -1.8, -2]  # 单位：米
-INTERP_DEPTH_STEP = 0.001  # 插值步长 (米)
+INTERP_DEPTH_STEP = 0.01  # 插值步长 (米)
 VMIN = -18
 VMAX = 5
 TICK_STEP = 3  # 颜色条主刻度间隔 (℃)
@@ -31,11 +31,12 @@ DATE_TICKS = 5  # 日期刻度数量
 
 # 颜色定义，
 COLORS = [
-    (-18, "#FF0000"),  # 深蓝
-    (-12, "#FFFF00"),  # 皇家蓝
-    (-6, "#5deb69"),  # 天蓝
-    (0, "#00FFFF"),  # 黄色
-    (5, "#0000FF"),  # 红色
+    (-18, "#ff2f00"),
+    (-10, "#FFFF00"),
+    (-6, "#5deb69"),
+    (-3, "#5debbc"),
+    (0, "#00FFFF"),
+    (5, "#0000FF"),
 ]
 
 # 间距控制参数（单位：磅）
@@ -70,13 +71,13 @@ df_temp = df[SELECTED_COLS].copy().astype(float)
 new_depths = np.arange(DEPTHS[0], DEPTHS[-1] - INTERP_DEPTH_STEP, -INTERP_DEPTH_STEP)
 interp_matrix = []
 
-# 对每个时间点进行三次样条插值
+# 对每个时间点进行2次样条插值
 for timestamp in df_temp.index:
     print("正在插值")
     depths_sorted = sorted(DEPTHS)
     values_sorted = [df_temp.loc[timestamp, col] for col in reversed(SELECTED_COLS)]
     f = interpolate.interp1d(
-        depths_sorted, values_sorted, kind="cubic", fill_value="extrapolate"
+        depths_sorted, values_sorted, kind="quadratic", fill_value="extrapolate"
     )
     interp_values = f(new_depths)
     interp_matrix.append(interp_values)

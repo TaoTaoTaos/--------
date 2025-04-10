@@ -1,0 +1,308 @@
+# 加载必要的包
+library(readxl)      # 读取Excel文件
+library(ggplot2)     # 绘图
+library(fields)      # 插值（替代akima）
+library(scales)      # 颜色和日期格式化
+library(viridis)     # 颜色方案
+library(lubridate)   # 日期处理
+library(grid)        # 图形控制
+library(cowplot)     # 图形布局
+# ================= 参数配置区域 =================
+selected_cols <- c(
+"CR温度1",
+"CR温度2",
+"温度9 (℃)",
+"温度8 (℃)",
+"温度7 (℃)",
+"温度6 (℃)",
+"温度5 (℃)",
+"温度4 (℃)",
+"温度3 (℃)",
+"温度2 (℃)",
+"温度1 (℃)"
+)
+depths <- c(0, -0.2, -0.4, -0.6, -0.8, -1, -1.2, -1.4, -1.6, -1.8, -2)  # 单位：米
+interp_depth_step <- 0.01  # 增大插值步长以提高性能(米)
+vmin <- -18
+vmax <- 5
+tick_step <- 3  # 颜色条主刻度间隔 (℃)
+date_ticks <- 5  # 日期刻度数量
+# 自定义颜色方案
+custom_colors <- c(
+"#FF0000",  # 深红 (-18°C)
+"#FFFF00",  # 黄色 (-12°C)
+"#5deb69",  # 绿色 (-6°C)
+"#00FFFF",  # 青色 (0°C)
+"#0000FF"   # 蓝色 (5°C)
+)
+# 间距控制参数（单位：磅）
+spacing <- list(
+xlabel_pad = 15,
+ylabel_pad = 20,
+xtick_pad = 10,
+ytick_pad = 8,
+cbar_label_pad = 15,
+cbar_tick_pad = 8
+)
+# ===============================================
+# 读取数据
+data_path <- "S:/STU-DATA/兴凯湖实地数据/2025.1.18-2.16/两个平台结合后的数据/逐分钟温度链数据(2.9) 修复温度5.xlsx"
+df <- read_excel(data_path)
+# 时间序列处理
+df$时间 <- as.POSIXct(df$时间)
+df <- df[, c("时间", selected_cols)]
+# 数据预处理
+df_temp <- df
+df_temp[, selected_cols] <- lapply(df_temp[, selected_cols], as.numeric)
+# 准备插值数据
+time_numeric <- as.numeric(df_temp$时间)
+depth_numeric <- depths
+temp_matrix <- as.matrix(df_temp[, selected_cols])
+# 创建插值网格（减少点数以提高性能）
+interp_grid <- expand.grid(
+time = seq(min(time_numeric), max(time_numeric), length.out = 500),  # 减少时间点数
+depth = seq(min(depth_numeric), max(depth_numeric), by = interp_depth_step)
+)
+# 使用fields包进行插值
+grid_list <- list(
+x = time_numeric,
+y = depth_numeric,
+z = t(temp_matrix)  # 注意转置矩阵
+)
+# 执行插值
+interp_values <- interp.surface(
+grid_list,
+loc = as.matrix(interp_grid)
+)
+)
+)
+# ggsave("temperature_heatmap.png", plot = p, width = 17, height = 9, dpi = 300)
+# ggsave("temperature_heatmap.png", plot = p, width = 17, height
+# 保存图形（可选）
+# ggsave("temperature_heatmap.png", plot = p, width = 17, height = 9, dpi = 300)
+# 保存图形（可选）
+# ggsave("temperature_heatmap.png", plot = p, width = 17, height = 9, dpi = 300)
+"CR温度1",
+# 显示图形（在RStudio的Plots面板中查看）
+print(p)
+# 保存图形（可选）
+# ggsave("temperature_heatmap.png", plot = p, width = 17, height = 9, dpi = 300)
+# 保存图形（可选）
+# ggsave("temperature_heatmap.png", plot = p, width = 17, height = 9, dpi = 300)
+# 加载必要的包
+library(readxl)      # 读取Excel文件
+library(ggplot2)     # 绘图
+library(fields)      # 插值（替代akima）
+library(scales)      # 颜色和日期格式化
+library(viridis)     # 颜色方案
+library(lubridate)   # 日期处理
+library(grid)        # 图形控制
+library(cowplot)     # 图形布局
+# ================= 参数配置区域 =================
+selected_cols <- c(
+"CR温度1",
+"CR温度2",
+"温度9 (℃)",
+"温度8 (℃)",
+"温度7 (℃)",
+"温度6 (℃)",
+"温度5 (℃)",
+"温度4 (℃)",
+"温度3 (℃)",
+"温度2 (℃)",
+"温度1 (℃)"
+)
+depths <- c(0, -0.2, -0.4, -0.6, -0.8, -1, -1.2, -1.4, -1.6, -1.8, -2)  # 单位：米
+interp_depth_step <- 0.01  # 增大插值步长以提高性能(米)
+vmin <- -18
+vmax <- 5
+tick_step <- 3  # 颜色条主刻度间隔 (℃)
+date_ticks <- 5  # 日期刻度数量
+# 自定义颜色方案
+custom_colors <- c(
+"#FF0000",  # 深红 (-18°C)
+"#FFFF00",  # 黄色 (-12°C)
+"#5deb69",  # 绿色 (-6°C)
+"#00FFFF",  # 青色 (0°C)
+"#0000FF"   # 蓝色 (5°C)
+)
+# 间距控制参数（单位：磅）
+spacing <- list(
+xlabel_pad = 15,
+ylabel_pad = 20,
+xtick_pad = 10,
+ytick_pad = 8,
+cbar_label_pad = 15,
+cbar_tick_pad = 8
+)
+# ===============================================
+# 读取数据
+data_path <- "S:/STU-DATA/兴凯湖实地数据/2025.1.18-2.16/两个平台结合后的数据/逐分钟温度链数据(2.9) 修复温度5.xlsx"
+df <- read_excel(data_path)
+# 时间序列处理
+df$时间 <- as.POSIXct(df$时间)
+df <- df[, c("时间", selected_cols)]
+# 数据预处理
+df_temp <- df
+df_temp[, selected_cols] <- lapply(df_temp[, selected_cols], as.numeric)
+# 准备插值数据
+time_numeric <- as.numeric(df_temp$时间)
+depth_numeric <- depths
+temp_matrix <- as.matrix(df_temp[, selected_cols])
+# 创建插值网格（减少点数以提高性能）
+interp_grid <- expand.grid(
+time = seq(min(time_numeric), max(time_numeric), length.out = 500),  # 减少时间点数
+depth = seq(min(depth_numeric), max(depth_numeric), by = interp_depth_step)
+)
+# 使用fields包进行插值
+grid_list <- list(
+x = time_numeric,
+y = depth_numeric,
+z = t(temp_matrix)  # 注意转置矩阵
+)
+# 执行插值
+interp_values <- interp.surface(
+grid_list,
+loc = as.matrix(interp_grid)
+)
+# 加载必要的包
+library(readxl)      # 读取Excel文件
+library(ggplot2)     # 绘图
+library(fields)      # 插值（替代akima）
+library(scales)      # 颜色和日期格式化
+library(viridis)     # 颜色方案
+library(lubridate)   # 日期处理
+library(grid)        # 图形控制
+library(cowplot)     # 图形布局
+# ================= 参数配置区域 =================
+selected_cols <- c(
+"CR温度1",
+"CR温度2",
+"温度9 (℃)",
+"温度8 (℃)",
+"温度7 (℃)",
+"温度6 (℃)",
+"温度5 (℃)",
+"温度4 (℃)",
+"温度3 (℃)",
+"温度2 (℃)",
+"温度1 (℃)"
+)
+depths <- c(0, -0.2, -0.4, -0.6, -0.8, -1, -1.2, -1.4, -1.6, -1.8, -2)  # 单位：米
+interp_depth_step <- 0.01  # 增大插值步长以提高性能(米)
+vmin <- -18
+vmax <- 5
+tick_step <- 3  # 颜色条主刻度间隔 (℃)
+date_ticks <- 5  # 日期刻度数量
+# 自定义颜色方案
+custom_colors <- c(
+"#FF0000",  # 深红 (-18°C)
+"#FFFF00",  # 黄色 (-12°C)
+"#5deb69",  # 绿色 (-6°C)
+"#00FFFF",  # 青色 (0°C)
+"#0000FF"   # 蓝色 (5°C)
+)
+# 间距控制参数（单位：磅）
+spacing <- list(
+xlabel_pad = 15,
+ylabel_pad = 20,
+xtick_pad = 10,
+ytick_pad = 8,
+cbar_label_pad = 15,
+cbar_tick_pad = 8
+)
+# ===============================================
+# 读取数据
+data_path <- "S:/STU-DATA/兴凯湖实地数据/2025.1.18-2.16/两个平台结合后的数据/逐分钟温度链数据(2.9) 修复温度5.xlsx"
+df <- read_excel(data_path)
+# 读取数据并处理缺失值
+df <- read_excel(data_path)
+df$时间 <- as.POSIXct(df$时间)
+df_temp <- df[, c("时间", selected_cols)] %>%
+na.omit()  # 移除包含NA的行
+source("S:/STU-DATA/兴凯湖实地数据/2025.1.18-2.16/数据处理CODE/R/.Rproj.user/shared/notebooks/1.R")
+source("S:/STU-DATA/兴凯湖实地数据/2025.1.18-2.16/数据处理CODE/R/.Rproj.user/shared/notebooks/1.R")
+source("S:/STU-DATA/兴凯湖实地数据/2025.1.18-2.16/数据处理CODE/R/.Rproj.user/shared/notebooks/1.R")
+source("S:/STU-DATA/兴凯湖实地数据/2025.1.18-2.16/数据处理CODE/R/.Rproj.user/shared/notebooks/1.R")
+source("S:/STU-DATA/兴凯湖实地数据/2025.1.18-2.16/数据处理CODE/R/.Rproj.user/shared/notebooks/1.R")
+source("S:/STU-DATA/兴凯湖实地数据/2025.1.18-2.16/数据处理CODE/R/.Rproj.user/shared/notebooks/1.R")
+source("S:/STU-DATA/兴凯湖实地数据/2025.1.18-2.16/数据处理CODE/R/.Rproj.user/shared/notebooks/1.R")
+# 确保加载所需包
+library(circlize)  # 添加colorRamp2函数所需的包
+# ================= 数据准备 =================
+# 读取数据并预处理
+df <- read_excel("your_data_path.xlsx") %>%
+mutate(时间 = as.POSIXct(时间)) %>%
+arrange(时间) %>%
+column_to_rownames("时间") %>%
+select(all_of(SELECTED_COLS)) %>%
+mutate(across(everything(), as.numeric))
+# ================= 插值处理 =================
+new_depths <- seq(0, -2, by = -INTERP_DEPTH_STEP)
+interp_fn <- function(row) {
+spline(
+x = sort(DEPTHS),
+y = rev(row),
+xout = new_depths,
+method = "natural"
+)$y
+}
+df_interp <- df %>%
+apply(1, interp_fn) %>%
+t() %>%
+as.data.frame() %>%
+set_names(sprintf("%dcm", abs(new_depths)*100)) %>%
+rownames_to_column("time") %>%
+mutate(time = as.POSIXct(time)) %>%
+pivot_longer(-time, names_to = "depth", = "temp") %>%
+# ================= 可视化 =================
+# 创建自定义颜色梯度
+color_ramp <- colorRamp2(
+breaks = (COLOR_VALUES - VMIN)/(VMAX - VMIN),
+colors = COLORS
+)
+# 生成日期刻度
+date_breaks <- df_interp %>%
+pull(time) %>%
+unique() %>%
+as.POSIXct() %>%
+seq(length.out = DATE_TICKS)
+ggplot(df_interp, aes(x = time, y = reorder(depth, depth_num), fill = temp)) +
+geom_tile() +
+scale_fill_gradientn(
+colours = color_ramp(seq(0, 1, length.out = 256)),
+limits = c(VMINMAX),
+breaks = seq(VMIN, VMAX, TICK_STEP),
+guide = guide_colorbar(
+title = "温度 (℃)",
+title.position = "top",
+barheight = unit(0.8, "npc"),
+label.position = "right"
+)
+) +
+scale_x_datetime(
+breaks = date_breaks,
+labels = date_format("%y/%m/%d"),
+expand = expansion(0)
+) +
+scale_y_discrete(
+breaks = sprintf("%dcm", abs(DEPTHS)*100),
+position = "right",
+expand = expansion(0)
+) +
+labs(x = "日期", y = "深度 (cm)") +
+theme_minimal(base_size = 12) +
+theme(
+axis.title.x = element_text(margin = margin(t = SPACING$xlabel_pad)),
+axis.title.y = element_text(margin = margin(r = SPACING$ylabel_pad)),
+axis.text.x = element_text(angle = 0, margin = margin(t = SPACING$xtick_pad)),
+axis.text.y = element_text(margin = margin(r = SPACING$ytick_pad)),
+legend.title = element_text(margin = margin(b = SPACING$cbar_label_pad)),
+legend.text = element_text(margin = margin(r = SPACING$cbar_tick_pad)),
+panel.grid = element_blank(),
+panel.border = element_rect(fill = NA, color = "black", linewidth = 1),
+plot.margin = margin(1, 1, 1, 1, "cm")
+)
+# ================= 保存图像 =================
+ggsave("temperature_heatmap.png", width = 17, height = 9, dpi = 300, units = "in")
+install.packages(c("tidyverse", "circlize", "viridis"))
